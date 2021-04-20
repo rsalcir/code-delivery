@@ -1,4 +1,4 @@
-module github.com/codeedu/imersaofsfc2-simulator
+module github.com/rsalcir/code-delivery
 
 go 1.16
 
