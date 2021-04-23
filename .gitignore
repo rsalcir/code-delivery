@@ -1,1 +1,4 @@
 apache-kafka/data
+
+api/dist
+api/node_modules
