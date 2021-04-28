@@ -1,4 +1,5 @@
 apache-kafka/data
 
 api/dist
+api/.docker/dbdata
 api/node_modules
