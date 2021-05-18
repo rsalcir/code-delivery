@@ -4,3 +4,4 @@ api/dist
 api/.docker/dbdata
 api/node_modules
 frontend/node_modules
+.env
