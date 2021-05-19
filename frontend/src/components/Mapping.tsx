@@ -14,16 +14,19 @@ import {
 } from "react";
 import { Route } from "../util/models";
 import { getCurrentPosition } from "../util/geolocation";
+import { makeCarIcon, makeMarkerIcon, Map } from "../util/map";
+import { RouteExistsError } from "../errors/route-exists.error";
+import { useSnackbar } from "notistack";
 
 const API_URL = process.env.REACT_APP_API_URL;
 const googleMapsLoader = new Loader(process.env.REACT_APP_GOOGLE_API_KEY);
-
-type Props = {};
-export const Mapping = (props: Props) => {
+ 
+export const Mapping = () => {
 
     const [routes, setRoutes] = useState<Route[]>([]);
     const [routeIdSelected, setRouteIdSelected] = useState<string>("");
-    const mapRef = useRef<google.maps.Map>();
+    const mapRef = useRef<Map>();
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         fetch(`${API_URL}/routes`)
@@ -39,17 +42,40 @@ export const Mapping = (props: Props) => {
               getCurrentPosition({ enableHighAccuracy: true }),
             ]);
             const divMap = document.getElementById("map") as HTMLElement;
-            mapRef.current = new google.maps.Map(divMap, {
-              zoom: 15,
-              center: position,
-            });
-          })();
+            mapRef.current = new Map(divMap, {
+                zoom: 15,
+                center: position,
+              });
+            })();
         }, []);
 
-    const startRoute = useCallback((event: FormEvent) => {
+    const startRoute = useCallback(
+        (event: FormEvent) => {
         event.preventDefault();
-        console.log(routeIdSelected);
-    }, [routeIdSelected]);
+       const route = routes.find((route) => route._id === routeIdSelected);
+       
+       try {
+       mapRef.current?.addRoute(routeIdSelected, {
+        currentMarkerOptions:{
+            position: route?.startPosition,
+        icon: makeCarIcon("#000"),
+       },
+       endMarkerOptions:{
+        position: route?.endPosition,
+        icon: makeMarkerIcon("#454545"),
+       }
+    })
+    } catch (error) {
+        if (error instanceof RouteExistsError) {
+        enqueueSnackbar(`${route?.title} já adicionado, espere finalizar.`, {
+            variant: "error",
+        });
+        return;
+        }
+        throw error;
+    }
+    }, [routeIdSelected, routes, enqueueSnackbar]
+    );
 
     return (
         <Grid container style={{width:'100%', height:'100%'}}>
