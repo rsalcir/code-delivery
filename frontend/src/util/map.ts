@@ -51,6 +51,12 @@ export class Route {
         }
         );
     }
+
+    delete() {
+        this.currentMarker.setMap(null);
+        this.endMarker.setMap(null);
+        this.directionsRenderer.setMap(null);
+    }
 }
 
 export class Map {
@@ -58,6 +64,16 @@ export class Map {
     private routes: {[id: string] : Route} = {};
     constructor(element: Element, options: google.maps.MapOptions){
         this.map = new google.maps.Map(element, options);
+    }
+
+    moveCurrentMarker(id: string, position: google.maps.LatLngLiteral) {
+        this.routes[id].currentMarker.setPosition(position);
+    }
+
+    removeRoute(id: string) {
+        const route = this.routes[id];
+        route.delete();
+        delete this.routes[id];
     }
 
     addRoute(

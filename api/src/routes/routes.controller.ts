@@ -8,6 +8,7 @@ import {
 import { ClientKafka, MessagePattern, Payload } from '@nestjs/microservices';
 import { Producer } from '@nestjs/microservices/external/kafka.interface';
 import { RoutesService } from './routes.service';
+import { RoutesGateway } from './routes.gateway';
 
 @Controller('routes')
 export class RoutesController implements OnModuleInit {
@@ -17,7 +18,8 @@ export class RoutesController implements OnModuleInit {
   constructor(
     private readonly routesService: RoutesService,
     @Inject('KAFKA_SERVICE')
-    private kafkaClient: ClientKafka
+    private kafkaClient: ClientKafka,
+    private routeGateway: RoutesGateway,
   ) {}
 
   @Get()
@@ -43,15 +45,21 @@ export class RoutesController implements OnModuleInit {
   }
 
   @MessagePattern('route.new-position')
-  consumeNewPosition(@Payload()
-  message: {
-    value: {
-      routeId: string;
-      clientId: string;
-      position: [number, number];
-      finished: boolean;
-    };
-  },){
-    console.log(message.value);  
+  consumeNewPosition(
+    @Payload()
+    message: {
+      value: {
+        routeId: string;
+        clientId: string;
+        position: [number, number];
+        finished: boolean;
+      };
+    },
+  ) {
+    
+  this.routeGateway.sendPosition({
+    ...message.value,
+    position: [message.value.position[1], message.value.position[0]],
+  });
   }
 }
