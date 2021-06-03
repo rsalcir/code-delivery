@@ -8,7 +8,8 @@
 ![screenshot](images/architecture.png)
 
 ## ⚙️ Como executar o projeto
-...
+
+![screenshot](images/map_delivery.png)
 
 💡É necessario executas os serviços para que o ecossistema funcione.
 
