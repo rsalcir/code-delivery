@@ -1,0 +1,13 @@
+POST route.new-position/_delete_by_query?conflicts=proceed
+{
+  "query":{
+    "match_all":{}
+  }
+}
+
+POST route.new-direction/_delete_by_query?conflicts=proceed
+{
+  "query":{
+    "match_all":{}
+  }
+}
